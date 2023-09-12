@@ -27,8 +27,7 @@ public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
   public static Grabber m_grabber = new Grabber();
-  public static Joystick Joystick = new Joystick(0);
-  public static final Joystick opBoard = new Joystick(1);
+  public static final Joystick opBoard = new Joystick(0);
   public static final JoystickButton manualGrabClose = new JoystickButton(opBoard, 12);
   public static final JoystickButton manualGrabOpen = new JoystickButton(opBoard, 14);
   public static final JoystickButton coneMode = new JoystickButton(opBoard, 11);

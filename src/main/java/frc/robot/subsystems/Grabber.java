@@ -24,6 +24,7 @@ public class Grabber extends SubsystemBase {
 
   double outputCurrent = 0;
   GenericEntry OutputCurrentEntry = Shuffleboard.getTab("Grabber").add("Output Current", outputCurrent).getEntry();
+  
   static Timer timer = new Timer(); 
 
   public Grabber() {
@@ -31,6 +32,7 @@ public class Grabber extends SubsystemBase {
   }
 
   public enum States{
+    NOTHING,
     PULL_START,
     PULL_TIME_ELAPSING,
     PULLING,
@@ -43,7 +45,8 @@ public class Grabber extends SubsystemBase {
   }
 
 
-  public static States state = States.PULL_START;
+  public static States state = States.NOTHING;
+  GenericEntry StateEntry = Shuffleboard.getTab("Grabber").add("State", 0).getEntry();
 
   public static void percentOutput(double output){
     grabberMotor1.getPIDController().setReference(output, ControlType.kDutyCycle);
@@ -62,11 +65,18 @@ public class Grabber extends SubsystemBase {
 
   public static void firstCurrentPass(){
     timer.start();
-    if(timer.hasElapsed(0.5)){
+    if(timer.hasElapsed(1)){
       timer.stop();
       timer.reset();
       // state = States.CLOSING_CURRENT;
     } 
+    if (state == States.PULL_TIME_ELAPSING)
+    {
+      state = States.PULLING;
+    }
+    else{
+      state = States.PUSHING;
+    }
   }
   
 
@@ -74,58 +84,64 @@ public class Grabber extends SubsystemBase {
   public void periodic() {
 
     // This method will be called once per scheduler run
-    System.out.println(grabberMotor2.getLastError());
+   
     if(DriverStation.isEnabled()) {
       outputCurrent = getOutputCurrentGrabber1();
       OutputCurrentEntry.setDouble(outputCurrent);
       switch(state) {
+        case NOTHING:
+          StateEntry.setDouble(0);
+          break;
         case PULL_START:
-          percentOutput(-Constants.GRABBER_MOVE_GAME_PIECE_SPEED);
+          StateEntry.setDouble(1);
+          percentOutput(Constants.GRABBER_MOVE_GAME_PIECE_SPEED);
           state = States.PULL_TIME_ELAPSING;
           break;
         case PULL_TIME_ELAPSING:
-          firstCurrentPass();
-          state = States.PULLING;
+          StateEntry.setDouble(2);
+
+          
           break;
         case PULLING:
+          StateEntry.setDouble(3);
           if (RobotContainer.coneMode.getAsBoolean()){
-            if (Constants.CONE_OUTPUT_CURRENT == getOutputCurrentGrabber1()) {
+            if (Constants.CONE_OUTPUT_CURRENT_MAX <= getOutputCurrentGrabber1()) {
               stopMotor();
-              percentOutput(Constants.GRABBBER_CONSTANT_PERCENT_OUTPUT);
               state = States.PULLED;
             }
-            
           }
           else{
-            if (Constants.CUBE_OUTPUT_CURRENT == getOutputCurrentGrabber1()) {
+            if (Constants.CUBE_OUTPUT_CURRENT_MAX <=  getOutputCurrentGrabber1()) {
               stopMotor();
-              percentOutput(Constants.GRABBBER_CONSTANT_PERCENT_OUTPUT);
               state = States.PULLED;
             }
           }
           break;
 
         case PULLED:
-          System.out.println("pulled");
+          StateEntry.setDouble(4);
+          percentOutput(Constants.GRABBBER_CONSTANT_PERCENT_OUTPUT);
           break;
         case PUSH_START:
-          percentOutput(Constants.GRABBER_MOVE_GAME_PIECE_SPEED);
+          StateEntry.setDouble(5);
+          percentOutput(-Constants.GRABBER_MOVE_GAME_PIECE_SPEED);
           state = States.PUSHING_TIME_ELAPSING;
           break;
         case PUSHING_TIME_ELAPSING:
-          firstCurrentPass();
-          state = States.PUSHING;
+          StateEntry.setDouble(6);
           break;
         case PUSHING:
-          if (Constants.GRABBER_EMPTY_OUTPUT_MAX  > getOutputCurrentGrabber1() &&  Constants.GRABBER_EMPTY_OUTPUT_MIN < getOutputCurrentGrabber1() ){
+          StateEntry.setDouble(7);
+          if (Constants.GRABBER_EMPTY_OUTPUT_MAX  <= getOutputCurrentGrabber1() ){
             stopMotor();
             state = States.PUSHED;
           }
           break;
         case PUSHED:
-          System.out.println("Pushed");
+          StateEntry.setDouble(8);
           break;
         default:
+          StateEntry.setDouble(9);
           System.out.print("something went wrong");
           break;
           
