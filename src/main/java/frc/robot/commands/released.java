@@ -10,21 +10,20 @@ import frc.robot.RobotContainer;
 import frc.robot.subsystems.Grabber;
 import frc.robot.subsystems.Grabber.States;
 
-public class grabberPush extends CommandBase {
- 
-  public grabberPush() {
-    addRequirements(RobotContainer.m_grabber);
+public class released extends CommandBase {
+  /** Creates a new released. */
+  public released() {
     // Use addRequirements() here to declare subsystem dependencies.
-    
+    addRequirements(RobotContainer.m_grabber);
   }
-
+  
   Timer timer = new Timer();
-
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
     timer.reset();
   }
+  
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
@@ -33,11 +32,7 @@ public class grabberPush extends CommandBase {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    timer.reset();
-    if(Grabber.state != States.PUSHED){
-      System.out.println("Pushing");
-      Grabber.state = States.PUSH_START;
-    }
+    Grabber.state = States.BUTTON_RELEASED;
   }
 
   // Returns true when the command should end.

@@ -22,13 +22,17 @@ public final class Constants {
   //Output current 
   //needs testing
 
-  public final static double CUBE_OUTPUT_CURRENT_MAX = 12;
-  public final static double CONE_OUTPUT_CURRENT_MAX = 17;
+  //Amps
+  public final static double CUBE_OUTPUT_CURRENT_MAX = 10;
+  
+  public final static double GRABBER_EMPTY_OUTPUT_MAX = 10;
+  public final static double CONE_OUTPUT_CURRENT_MAX = 10;
 
+  //percent output
   public final static double GRABBBER_CONSTANT_PERCENT_OUTPUT = 0.125;
   public final static double GRABBER_MOVE_GAME_PIECE_SPEED = 0.3;
 
-  public final static double GRABBER_EMPTY_OUTPUT_MAX = 0.325;
-  public final static double GRABBER_EMPTY_OUTPUT_MIN = 0.125;
+
+  
 
 }

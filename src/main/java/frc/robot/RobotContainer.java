@@ -14,8 +14,10 @@ import frc.robot.commands.Autos;
 import frc.robot.commands.ExampleCommand;
 import frc.robot.commands.grabberPull;
 import frc.robot.commands.grabberPush;
+import frc.robot.commands.released;
 import frc.robot.subsystems.ExampleSubsystem;
 import frc.robot.subsystems.Grabber;
+import frc.robot.subsystems.Grabber.States;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -54,8 +56,17 @@ public class RobotContainer {
    */
   private void configureBindings() {
     // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
-    manualGrabOpen.onTrue(new grabberPull());
-    manualGrabClose.onTrue(new grabberPush());
+    if(Grabber.state != States.PULLED){
+      manualGrabOpen.whileFalse(new grabberPull());
+    
+    }
+    if (Grabber.state != States.PUSHED){
+      manualGrabClose.whileFalse(new grabberPush());
+    }
+ 
+
+    manualGrabClose.whileTrue(new released());
+    manualGrabOpen.whileTrue(new released());
 
     // Schedule `exampleMethodCommand` when the Xbox controller's B button is pressed,
     // cancelling on release.
