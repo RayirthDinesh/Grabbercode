@@ -4,24 +4,22 @@
 
 package frc.robot.commands;
 
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.Grabber;
 import frc.robot.subsystems.Grabber.States;
 
-public class grabberPull extends CommandBase {
-  /** Creates a new grabberPull. */
-  public grabberPull() {
-    // Use addRequirements() here to declare subsystem dependencies.
+public class releasedPush extends CommandBase {
+  /** Creates a new releasedPull. */
+  public releasedPush() {
     addRequirements(RobotContainer.m_grabber);
+    // Use addRequirements() here to declare subsystem dependencies.
   }
   boolean end = false;
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    System.out.println("Pulling");
-    Grabber.state = States.PULL_START;
+    Grabber.state = States.STOP_MOTOR_PUSH;
     end = true;
   }
 
@@ -33,14 +31,11 @@ public class grabberPull extends CommandBase {
   @Override
   public void end(boolean interrupted) {
     
-      // System.out.println("Pulling");
-      // Grabber.state = States.PULL_START;
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    
     return end;
   }
 }

@@ -18,14 +18,16 @@ public class grabberPush extends CommandBase {
     
   }
 
-  Timer timer = new Timer();
 
+  // Called when the command is initially scheduled.
+  boolean end = false;
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    timer.reset();
+    System.out.println("Pushing");
+    Grabber.state = States.PUSH_START;
+    end = true;
   }
-
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {}
@@ -33,14 +35,14 @@ public class grabberPush extends CommandBase {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    timer.reset();
-      System.out.println("Pushing");
-      Grabber.state = States.PUSH_START;
+     
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    
+    return end;
+    
   }
 }

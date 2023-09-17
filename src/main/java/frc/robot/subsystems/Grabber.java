@@ -41,7 +41,8 @@ public class Grabber extends SubsystemBase {
     PUSH_START,
     PUSHING_TIME_ELAPSING,
     PUSHING,
-    STOP_MOTOR;
+    STOP_MOTOR_PULL,
+    STOP_MOTOR_PUSH;
 
   }
 
@@ -64,23 +65,27 @@ public class Grabber extends SubsystemBase {
   }
 
 
-  public static void firstCurrentPass(){
+  public static void firstCurrentPassPulling(){
     timer.start();
     if(timer.hasElapsed(0.5)){
       timer.stop();
       timer.reset();
-    
-      if (state == States.PULL_TIME_ELAPSING)
-      {
-        state = States.PULLING;
-      }
-    else if (state == States.PUSHING_TIME_ELAPSING)
-    {
-      state = States.PUSHING;
+      state = States.PULLING;
+
       // state = States.CLOSING_CURRENT;
     }
   }
-}
+
+  public static void firstCurrentPassPushing(){
+    timer.start();
+    if(timer.hasElapsed(0.5)){
+      timer.stop();
+      timer.reset();
+      state = States.PUSHING;
+
+      // state = States.CLOSING_CURRENT;
+    }
+  }
 
   @Override
   public void periodic() {
@@ -101,19 +106,19 @@ public class Grabber extends SubsystemBase {
           break;
         case PULL_TIME_ELAPSING:
           StateEntry.setString("Pull Time Elapsing");
-          firstCurrentPass();
+          firstCurrentPassPulling();
           break;
         case PULLING:
           StateEntry.setString("Pulling");
           if (RobotContainer.coneMode.getAsBoolean()){
             if (Constants.CONE_OUTPUT_CURRENT_MAX <= getOutputCurrentGrabber1()) {
-              state = States.STOP_MOTOR;
+              state = States.STOP_MOTOR_PULL;
               
             }
           }
           else{
             if (Constants.CUBE_OUTPUT_CURRENT_MAX <=  getOutputCurrentGrabber1()) {
-              state = States.STOP_MOTOR;
+              state = States.STOP_MOTOR_PUSH;
             }
           }
           break;
@@ -134,12 +139,12 @@ public class Grabber extends SubsystemBase {
           break;
         case PUSHING_TIME_ELAPSING:
           StateEntry.setString("Pushing Time Elapsing");
-          firstCurrentPass();
+          firstCurrentPassPushing();
          break;
         case PUSHING:
           StateEntry.setString("Pushing");
           if (Constants.GRABBER_EMPTY_OUTPUT_MAX  <= getOutputCurrentGrabber1() ){
-            state = States.STOP_MOTOR;
+            state = States.STOP_MOTOR_PUSH;
           }
           break;
         // case PUSHED:
@@ -148,8 +153,13 @@ public class Grabber extends SubsystemBase {
         //   StateEntry.setDouble(8);
         //   grabberMotor1.setIdleMode(IdleMode.kBrake);
         //   stopMotor();
-        //   break;
-        case STOP_MOTOR:
+        //   break
+        
+        case STOP_MOTOR_PULL:
+          StateEntry.setString("Stop Motor");
+          stopMotor();
+          break;
+        case STOP_MOTOR_PUSH:
           StateEntry.setString("Stop Motor");
           stopMotor();
           break;

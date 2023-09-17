@@ -5,6 +5,8 @@
 package frc.robot;
 
 
+import javax.swing.plaf.nimbus.State;
+
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -14,7 +16,8 @@ import frc.robot.commands.Autos;
 import frc.robot.commands.ExampleCommand;
 import frc.robot.commands.grabberPull;
 import frc.robot.commands.grabberPush;
-import frc.robot.commands.released;
+import frc.robot.commands.releasedPull;
+import frc.robot.commands.releasedPush;
 import frc.robot.subsystems.ExampleSubsystem;
 import frc.robot.subsystems.Grabber;
 import frc.robot.subsystems.Grabber.States;
@@ -56,14 +59,15 @@ public class RobotContainer {
    */
   private void configureBindings() {
     // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
-   
-    manualGrabOpen.whileFalse(new grabberPull());
-    manualGrabClose.whileFalse(new grabberPush());
+  
+    manualGrabOpen.onTrue(new grabberPull());
+    manualGrabClose.onTrue(new grabberPush());
   
  
 
-    manualGrabClose.whileTrue(new released());
-    manualGrabOpen.whileTrue(new released());
+    manualGrabOpen.onFalse(new releasedPull());
+    manualGrabClose.onFalse(new releasedPush());
+
 
     // Schedule `exampleMethodCommand` when the Xbox controller's B button is pressed,
     // cancelling on release.
