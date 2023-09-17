@@ -26,12 +26,11 @@ public class Grabber extends SubsystemBase {
 
   double outputCurrent = 0;
   GenericEntry OutputCurrentEntry = Shuffleboard.getTab("Grabber").add("Output Current", outputCurrent).getEntry();
-  GenericEntry flag = Shuffleboard.getTab("Grabber").add("Flag", 0).getEntry();
   static Timer timer = new Timer(); 
 
   public Grabber() {
     grabberMotor2.follow(grabberMotor1, true);
-    grabberMotor1.setIdleMode(IdleMode.kCoast);
+    grabberMotor1.setIdleMode(IdleMode.kBrake);
   }
 
   public enum States{
@@ -39,18 +38,16 @@ public class Grabber extends SubsystemBase {
     PULL_START,
     PULL_TIME_ELAPSING,
     PULLING,
-    PULLED,
     PUSH_START,
     PUSHING_TIME_ELAPSING,
     PUSHING,
-    PUSHED,
-    BUTTON_RELEASED;
+    STOP_MOTOR;
 
   }
 
 
   public static States state = States.NOTHING;
-  GenericEntry StateEntry = Shuffleboard.getTab("Grabber").add("State", 0).getEntry();
+  GenericEntry StateEntry = Shuffleboard.getTab("Grabber").add("State", "Nothing").getEntry();
 
   public static void percentOutput(double output){
     grabberMotor1.getPIDController().setReference(output, ControlType.kDutyCycle);
@@ -69,18 +66,18 @@ public class Grabber extends SubsystemBase {
 
   public static void firstCurrentPass(){
     timer.start();
-    if(timer.hasElapsed(3)){
+    if(timer.hasElapsed(0.5)){
       timer.stop();
       timer.reset();
     
       if (state == States.PULL_TIME_ELAPSING)
+      {
+        state = States.PULLING;
+      }
+    else if (state == States.PUSHING_TIME_ELAPSING)
     {
-      state = States.PULLING;
-    }
-    else if (state == States.PUSHING_TIME_ELAPSING){
       state = States.PUSHING;
       // state = States.CLOSING_CURRENT;
-
     }
   }
 }
@@ -95,78 +92,65 @@ public class Grabber extends SubsystemBase {
       OutputCurrentEntry.setDouble(outputCurrent);
       switch(state) {
         case NOTHING:
-          StateEntry.setDouble(0);
+          StateEntry.setString("Nothing");
           break;
         case PULL_START:
-          StateEntry.setDouble(1);
+          StateEntry.setString("Pull Start");
           percentOutput(Constants.GRABBER_MOVE_GAME_PIECE_SPEED);
           state = States.PULL_TIME_ELAPSING;
-          System.out.println("Pull Start");
           break;
         case PULL_TIME_ELAPSING:
-          StateEntry.setDouble(2);
-          System.out.println("Pull elapse");
+          StateEntry.setString("Pull Time Elapsing");
           firstCurrentPass();
-
           break;
         case PULLING:
-        System.out.println("Pulling");
-
-          StateEntry.setDouble(3);
+          StateEntry.setString("Pulling");
           if (RobotContainer.coneMode.getAsBoolean()){
             if (Constants.CONE_OUTPUT_CURRENT_MAX <= getOutputCurrentGrabber1()) {
-              flag.setDouble(1);
-              state = States.PULLED;
+              state = States.STOP_MOTOR;
               
             }
           }
           else{
             if (Constants.CUBE_OUTPUT_CURRENT_MAX <=  getOutputCurrentGrabber1()) {
-              state = States.PULLED;
+              state = States.STOP_MOTOR;
             }
           }
           break;
 
-        case PULLED:
-          System.out.println("Pulled");
+        // case PULLED:
+        //   System.out.println("Pulled");
 
-          StateEntry.setDouble(4);
-          grabberMotor1.setIdleMode(IdleMode.kBrake);
+        //   StateEntry.setDouble(4);
+        //   grabberMotor1.setIdleMode(IdleMode.kBrake);
 
-          stopMotor();
-          //percentOutput(Constants.GRABBBER_CONSTANT_PERCENT_OUTPUT);
-          break;
+        //   stopMotor();
+        //   //percentOutput(Constants.GRABBBER_CONSTANT_PERCENT_OUTPUT);
+        //   break;
         case PUSH_START:
-          System.out.println("Push Start");
-
-          StateEntry.setDouble(5);
+          StateEntry.setString("Push Start");
           percentOutput(-Constants.GRABBER_MOVE_GAME_PIECE_SPEED);
           state = States.PUSHING_TIME_ELAPSING;
           break;
         case PUSHING_TIME_ELAPSING:
-          System.out.println("Push elapse");
-
+          StateEntry.setString("Pushing Time Elapsing");
           firstCurrentPass();
-          StateEntry.setDouble(6);
          break;
         case PUSHING:
-          System.out.println("Pushing");
-
-          StateEntry.setDouble(7);
+          StateEntry.setString("Pushing");
           if (Constants.GRABBER_EMPTY_OUTPUT_MAX  <= getOutputCurrentGrabber1() ){
-            state = States.PUSHED;
-            flag.setDouble(1);
+            state = States.STOP_MOTOR;
           }
           break;
-        case PUSHED:
-          System.out.println("Pushed");
+        // case PUSHED:
+        //   System.out.println("Pushed");
 
-          StateEntry.setDouble(8);
-          grabberMotor1.setIdleMode(IdleMode.kBrake);
-          stopMotor();
-          break;
-        case BUTTON_RELEASED:
-          StateEntry.setDouble(8);
+        //   StateEntry.setDouble(8);
+        //   grabberMotor1.setIdleMode(IdleMode.kBrake);
+        //   stopMotor();
+        //   break;
+        case STOP_MOTOR:
+          StateEntry.setString("Stop Motor");
           stopMotor();
           break;
         default:

@@ -56,13 +56,10 @@ public class RobotContainer {
    */
   private void configureBindings() {
     // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
-    if(Grabber.state != States.PULLED){
-      manualGrabOpen.whileFalse(new grabberPull());
-    
-    }
-    if (Grabber.state != States.PUSHED){
-      manualGrabClose.whileFalse(new grabberPush());
-    }
+   
+    manualGrabOpen.whileFalse(new grabberPull());
+    manualGrabClose.whileFalse(new grabberPush());
+  
  
 
     manualGrabClose.whileTrue(new released());

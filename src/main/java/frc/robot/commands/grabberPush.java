@@ -34,10 +34,8 @@ public class grabberPush extends CommandBase {
   @Override
   public void end(boolean interrupted) {
     timer.reset();
-    if(Grabber.state != States.PUSHED){
       System.out.println("Pushing");
       Grabber.state = States.PUSH_START;
-    }
   }
 
   // Returns true when the command should end.

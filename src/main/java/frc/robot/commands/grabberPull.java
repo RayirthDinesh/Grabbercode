@@ -32,10 +32,8 @@ public class grabberPull extends CommandBase {
   @Override
   public void end(boolean interrupted) {
     timer.reset();
-    if(Grabber.state != States.PULLED){
       System.out.println("Pulling");
       Grabber.state = States.PULL_START;
-    }
   }
 
   // Returns true when the command should end.

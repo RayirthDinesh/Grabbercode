@@ -32,7 +32,8 @@ public class released extends CommandBase {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    Grabber.state = States.BUTTON_RELEASED;
+    if (Grabber.state != States.NOTHING)
+      Grabber.state = States.STOP_MOTOR;
   }
 
   // Returns true when the command should end.
